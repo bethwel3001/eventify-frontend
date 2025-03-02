@@ -1,6 +1,9 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 # eventify-frontend
 =======
+=======
+>>>>>>> de0eb17b61ffab7fb442fce84c8e09d29d120593
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
@@ -71,4 +74,7 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+<<<<<<< HEAD
 >>>>>>> eba1645 (Added light / dark mode toggler to Navbar (status 200 OK))
+=======
+>>>>>>> de0eb17b61ffab7fb442fce84c8e09d29d120593
