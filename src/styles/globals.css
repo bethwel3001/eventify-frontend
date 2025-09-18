@@ -1,9 +1,8 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-/* Global customizations */
 body {
-    font-family: 'Inter', sans-serif; /* Ensure this matches your design */
+    font-family: 'Inter', sans-serif;
     background-color: #f9f9f9;
     color: #333;
   }
@@ -21,13 +20,39 @@ body {
   }
   
   @keyframes fadeIn {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
   }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 1s ease-out forwards;
+}
+
+.animate-fadeIn.delay-300 {
+  animation-delay: 0.3s;
+  opacity: 0;
+}
+
+.animate-fadeIn.delay-500 {
+  animation-delay: 0.5s;
+  opacity: 0;
+}
+
+.animate-fadeIn.delay-700 {
+  animation-delay: 0.7s;
+  opacity: 0;
+}
+
+/* Smooth transitions for dark mode */
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
   
   .backdrop-blur-md {
     backdrop-filter: blur(8px);
@@ -36,4 +61,29 @@ body {
   .animate-fadeIn {
     animation: fadeIn 0.5s ease-out forwards;
   }
-  
+  @keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.8s ease-out forwards;
+}
+
+.animate-fade-in-up.delay-150 {
+  animation-delay: 0.15s;
+}
+
+.animate-fade-in-up.delay-300 {
+  animation-delay: 0.3s;
+}
+
+.animate-fade-in-up.delay-500 {
+  animation-delay: 0.5s;
+}
