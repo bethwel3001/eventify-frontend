@@ -1,138 +1,165 @@
-import React, { useEffect } from "react";
-import { motion } from "framer-motion"; // Animation library
+import React, { useEffect, useRef } from "react";
+import { motion, useInView } from "framer-motion";
 
 const About = () => {
-  // Animation on load
-  const fadeIn = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { duration: 1 } },
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: "-100px" });
+
+  const fadeInUp = {
+    hidden: { opacity: 0, y: 60 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: { 
+        duration: 0.8,
+        ease: "easeOut"
+      }
+    }
   };
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const sections = document.querySelectorAll(".animate-on-scroll");
-      sections.forEach((section) => {
-        const rect = section.getBoundingClientRect();
-        if (rect.top <= window.innerHeight && rect.bottom >= 0) {
-          section.classList.add("in-view");
-        }
-      });
-    };
+  const staggerChildren = {
+    visible: {
+      transition: {
+        staggerChildren: 0.2
+      }
+    }
+  };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  const featureCards = [
+    {
+      title: "Easy Event Discovery",
+      description: "Find events tailored to your interests and location with our intelligent recommendation system.",
+      gradient: "from-blue-500 to-purple-600",
+      icon: (
+        <svg className="w-12 h-12 text-white mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+      )
+    },
+    {
+      title: "Host Effortlessly",
+      description: "Plan, organize, and host events with our intuitive tools. From ticketing to promotions, we've got you covered.",
+      gradient: "from-purple-500 to-pink-600",
+      icon: (
+        <svg className="w-12 h-12 text-white mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+        </svg>
+      )
+    },
+    {
+      title: "Engage Communities",
+      description: "Foster meaningful connections and community bonds through shared experiences and interactions.",
+      gradient: "from-pink-500 to-red-500",
+      icon: (
+        <svg className="w-12 h-12 text-white mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+        </svg>
+      )
+    }
+  ];
 
   return (
-    <div id="about" className="bg-white dark:bg-gray-900 min-h-screen py-8">
-      <motion.h1
-        className="text-4xl font-bold text-center mb-8 dark:text-white"
-        variants={fadeIn}
-        initial="hidden"
-        animate="visible"
-      >
-        About Eventify
-      </motion.h1>
+    <section id="about" ref={ref} className="bg-white dark:bg-gray-900 min-h-screen py-16 md:py-24 px-4 overflow-hidden">
+      <div className="container mx-auto max-w-6xl">
+        {/* Header Section */}
+        <motion.div 
+          className="text-center mb-16"
+          initial={{ opacity: 0, y: 30 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8 }}
+        >
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-800 dark:text-white mb-6">
+            About <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-600">Eventify</span>
+          </h2>
+          <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-600 mx-auto mb-8"></div>
+          
+          <div className="max-w-3xl mx-auto">
+            <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">
+              Eventify is your premier platform for discovering, hosting, and connecting through extraordinary events. 
+              Whether you're looking for local happenings or planning to organize your own gathering, we provide the tools 
+              and community to make every experience memorable.
+            </p>
+            <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 leading-relaxed">
+              Our mission is to bring people together, creating spaces where communities thrive and memories are made. 
+              Join thousands of event enthusiasts who trust Eventify to transform how they discover and host events.
+            </p>
+          </div>
+        </motion.div>
 
-      <div className="px-4 max-w-3xl mx-auto text-gray-700 dark:text-gray-300">
-        <motion.p
-          className="mb-4 text-lg"
-          variants={fadeIn}
+        {/* Features Section */}
+        <motion.div 
+          className="mb-16"
+          variants={staggerChildren}
           initial="hidden"
-          animate="visible"
+          animate={isInView ? "visible" : ""}
         >
-          Eventify is your go-to platform for discovering, hosting, and
-          connecting through events. Whether you're looking for something
-          happening nearby or want to organize your own, we've got you
-          covered.
-        </motion.p>
-        <motion.p
-          variants={fadeIn}
-          initial="hidden"
-          animate="visible"
-          className="text-lg"
+          <motion.h3 
+            className="text-3xl md:text-4xl font-bold text-center text-gray-800 dark:text-white mb-12"
+            variants={fadeInUp}
+          >
+            Why Choose Eventify?
+          </motion.h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {featureCards.map((card, index) => (
+              <motion.div
+                key={index}
+                className="relative group"
+                variants={fadeInUp}
+              >
+                <div className={`bg-gradient-to-br ${card.gradient} p-8 rounded-2xl shadow-xl transform transition-all duration-500 group-hover:-translate-y-2 h-full flex flex-col`}>
+                  <div className="text-center mb-6">
+                    {card.icon}
+                  </div>
+                  <h4 className="text-xl font-bold text-white text-center mb-4">
+                    {card.title}
+                  </h4>
+                  <p className="text-gray-100 text-center mb-6 flex-grow">
+                    {card.description}
+                  </p>
+                  <div className="text-center">
+                    <motion.button
+                      className="px-6 py-3 bg-white text-gray-800 font-semibold rounded-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      Learn More
+                    </motion.button>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Stats Section */}
+        <motion.div 
+          className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-800 rounded-2xl p-8 md:p-12 shadow-inner"
+          initial={{ opacity: 0 }}
+          animate={isInView ? { opacity: 1 } : {}}
+          transition={{ delay: 0.5, duration: 0.8 }}
         >
-          Our mission is to bring communities together, one event at a time.
-          Join us and make unforgettable memories with your community.
-        </motion.p>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+            <div>
+              <div className="text-3xl md:text-4xl font-bold text-blue-600 dark:text-blue-400 mb-2">50K+</div>
+              <div className="text-gray-600 dark:text-gray-300">Events Hosted</div>
+            </div>
+            <div>
+              <div className="text-3xl md:text-4xl font-bold text-purple-600 dark:text-purple-400 mb-2">200K+</div>
+              <div className="text-gray-600 dark:text-gray-300">Happy Users</div>
+            </div>
+            <div>
+              <div className="text-3xl md:text-4xl font-bold text-pink-600 dark:text-pink-400 mb-2">30+</div>
+              <div className="text-gray-600 dark:text-gray-300">Cities</div>
+            </div>
+            <div>
+              <div className="text-3xl md:text-4xl font-bold text-indigo-600 dark:text-indigo-400 mb-2">99%</div>
+              <div className="text-gray-600 dark:text-gray-300">Satisfaction Rate</div>
+            </div>
+          </div>
+        </motion.div>
       </div>
-
-      {/* Features Section */}
-      <section id="features" className="py-16 px-4">
-        <motion.h2
-          className="text-3xl font-bold text-center mb-8 dark:text-white"
-          variants={fadeIn}
-          initial="hidden"
-          animate="visible"
-        >
-        </motion.h2>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Feature Card 1 */}
-          <motion.div
-            className="bg-gradient-to-r from-green-400 to-blue-500 p-6 rounded-lg shadow-lg text-center transform transition-all duration-300 hover:scale-105 hover:shadow-xl hover:border-4 hover:border-yellow-500 animate-on-scroll"
-            variants={fadeIn}
-            initial="hidden"
-            animate="visible"
-          >
-            <h3 className="font-bold text-xl text-white">Easy Event Discovery</h3>
-            <p className="text-gray-100">
-              Find events tailored to your interests and location.
-            </p>
-             {/* Join Now Button */}
-      <motion.button
-        className="mt-4 px-6 py-3 bg-blue-500 text-white font-semibold rounded-lg transition-all duration-300 transform hover:scale-110 hover:bg-blue-600"
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.95 }}
-      >
-        Join Now
-      </motion.button>
-          </motion.div>
-
-          {/* Feature Card 2 */}
-          <motion.div
-            className="bg-gradient-to-r from-pink-500 to-purple-600 p-6 rounded-lg shadow-lg text-center transform transition-all duration-300 hover:scale-105 hover:shadow-xl hover:border-4 hover:border-green-500 animate-on-scroll"
-            variants={fadeIn}
-            initial="hidden"
-            animate="visible"
-          >
-            <h3 className="font-bold text-xl text-white">Host Effortlessly</h3>
-            <p className="text-gray-100">
-              Plan, organize, and host events with ease, try and testify.
-            </p>
-             {/* Join Now Button */}
-      <motion.button
-        className="mt-4 px-6 py-3 bg-blue-500 text-white font-semibold rounded-lg transition-all duration-300 transform hover:scale-110 hover:bg-blue-600"
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.95 }}
-      >
-        Join Now
-      </motion.button>
-          </motion.div>
-
-          {/* Feature Card 3 */}
-          <motion.div
-            className="bg-gradient-to-r from-yellow-400 to-red-500 p-6 rounded-lg shadow-lg text-center transform transition-all duration-300 hover:scale-105 hover:shadow-xl hover:border-4 hover:border-blue-500 animate-on-scroll"
-            variants={fadeIn}
-            initial="hidden"
-            animate="visible"
-          >
-            <h3 className="font-bold text-xl text-white">Engage Communities</h3>
-            <p className="text-gray-100">
-              Foster community bonds through shared experiences.
-            </p>
-             {/* Join Now Button */}
-      <motion.button
-        className="mt-4 px-6 py-3 bg-blue-500 text-white font-semibold rounded-lg transition-all duration-300 transform hover:scale-110 hover:bg-blue-600"
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.95 }}
-      >
-        Join Now
-      </motion.button>
-          </motion.div>
-        </div>
-      </section>
-    </div>
+    </section>
   );
 };
 
