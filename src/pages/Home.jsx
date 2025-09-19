@@ -1,8 +1,17 @@
 import React from "react";
+import { motion } from "framer-motion";
+import Button from "../components/Button";
 
 const Home = () => {
   const handleHostEvent = () => {
     window.open("/events", "_blank", "noopener,noreferrer");
+  };
+
+  const scrollToExplore = () => {
+    const exploreSection = document.getElementById('explore');
+    if (exploreSection) {
+      exploreSection.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   return (
@@ -29,20 +38,45 @@ const Home = () => {
             </p>
           </div>
 
-          <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 mt-6 sm:mt-10 animate-fade-in-up delay-500 w-full max-w-md sm:max-w-lg">
-            <a
-              href="#explore"
-              className="px-6 py-3 sm:px-8 sm:py-4 bg-white text-blue-600 dark:bg-blue-500 dark:text-white rounded-lg shadow-lg font-semibold text-base sm:text-lg transition-all duration-300 transform hover:scale-105 hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-white focus:ring-opacity-50"
+          {/* Enhanced Button Container - Side by side on ALL screens */}
+          <motion.div 
+            className="flex flex-row justify-center gap-3 sm:gap-4 mt-6 sm:mt-10 animate-fade-in-up delay-500 w-full max-w-md sm:max-w-lg"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.6 }}
+          >
+            {/* Explore Events Button */}
+            <motion.div 
+              className="flex-1 min-w-[120px] sm:min-w-[140px]"
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
             >
-              Explore Events
-            </a>
-            <button
-              onClick={handleHostEvent}
-              className="px-6 py-3 sm:px-8 sm:py-4 border-2 border-white text-white rounded-lg shadow-lg font-semibold text-base sm:text-lg transition-all duration-300 transform hover:scale-105 hover:bg-white hover:text-blue-600 hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-white focus:ring-opacity-50"
+              <Button
+                label="Explore Events"
+                onClick={scrollToExplore}
+                type="primary"
+                size="large"
+                fullWidth={true}
+                className="text-sm sm:text-base md:text-lg font-semibold"
+              />
+            </motion.div>
+
+            {/* Host Event Button */}
+            <motion.div 
+              className="flex-1 min-w-[120px] sm:min-w-[140px]"
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
             >
-              Host an Event
-            </button>
-          </div>
+              <Button
+                label="Host Event"
+                onClick={handleHostEvent}
+                type="outline"
+                size="large"
+                fullWidth={true}
+                className="text-sm sm:text-base md:text-lg font-semibold"
+              />
+            </motion.div>
+          </motion.div>
         </div>
       </div>
 
