@@ -5,19 +5,12 @@ module.exports = {
     "./src/**/*.{js,jsx,ts,tsx}"
   ],
 
-
-  // dark / light toggler
   darkMode: 'class',
 
-  
-  // BYE BYE VANILLA CSS
-  // tailwind my new CATCH!
   theme: {
     extend: {
-      // keyframes animations
       animation: {
         fadeIn: "fadeIn 1s ease-in-out",
-        // fadeOut: "fadeOut 1s ease-in-out",
       },
       animation: {
         "fade-in": "fadeIn 2s ease-in-out",
@@ -28,7 +21,6 @@ module.exports = {
       animation: {
         scroll: 'scroll 25s linear infinite',
       },
-      // fonts for partners section
       fontFamily: {
         inter: ['Inter', 'sans-serif'],
       },
