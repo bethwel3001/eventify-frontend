@@ -1,325 +1,315 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Link } from "react-scroll";
-// YOU GUYS NEVER TOLD ME REACT IS THIS SWEET!!!!!!!!!!
-// SLEEK SITE - IM NEVER BUILDING SITES TRADITIONALLY
+import AuthModal from "./AuthModal";
+import { Menu, X, Sun, Moon } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+
 const Navbar = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [darkMode, setDarkMode] = useState(
-    localStorage.getItem("theme") === "dark"
-  );
+  const [darkMode, setDarkMode] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [activeSection, setActiveSection] = useState("home");
+  const [mounted, setMounted] = useState(false);
 
-  const toggleTheme = () => {
-    const newTheme = darkMode ? "light" : "dark";
-    setDarkMode(!darkMode);
-    document.documentElement.classList.toggle("dark", !darkMode);
-    localStorage.setItem("theme", newTheme);
-  };
-  
-  // Var for login / signup popup
-  const [isLogin, setIsLogin] = useState(true);  
-  const [isOpen, setIsOpen] = useState(false);
+  // Prevent body scrolling when menu is open
+  useEffect(() => {
+    if (isMenuOpen) {
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.width = '100%';
+    } else {
+      document.body.style.overflow = 'unset';
+      document.body.style.position = 'static';
+      document.body.style.width = 'auto';
+    }
+    
+    return () => {
+      document.body.style.overflow = 'unset';
+      document.body.style.position = 'static';
+      document.body.style.width = 'auto';
+    };
+  }, [isMenuOpen]);
 
-  const [formData, setFormData] = useState({ email: '', password: '' });
-    const [errorMessage, setErrorMessage] = useState('');
-    const [loading, setLoading] = useState(false);
+  // Initialize theme from localStorage or system preference
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme");
+    const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    
+    const initialTheme = savedTheme === "dark" || (!savedTheme && systemPrefersDark);
+    setDarkMode(initialTheme);
+    document.documentElement.classList.toggle("dark", initialTheme);
+    setMounted(true);
+  }, []);
 
-    const handleSubmit = async (e, endpoint) => {
-        e.preventDefault();
-        setLoading(true);
-        try {
-            const response = await fetch(`http://127.0.0.1:5000/${endpoint}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: new URLSearchParams(formData)
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                window.location.href = data.redirect_url; // Redirect to dashboard
-            } else {
-                setErrorMessage(data.error || 'Something went wrong');
+  // Handle scroll for navbar styling and active section
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!isMenuOpen) {
+        setIsScrolled(window.scrollY > 20);
+        
+        // Update active section based on scroll position
+        const sections = ['home', 'about', 'partners', 'explore', 'testimonials', 'contact', 'faqs'];
+        const scrollPosition = window.scrollY + 100;
+        
+        for (const section of sections) {
+          const element = document.getElementById(section);
+          if (element) {
+            const offsetTop = element.offsetTop;
+            const offsetBottom = offsetTop + element.offsetHeight;
+            
+            if (scrollPosition >= offsetTop && scrollPosition < offsetBottom) {
+              setActiveSection(section);
+              break;
             }
-        } catch (error) {
-            setErrorMessage('Error connecting to server');
-        } finally {
-            setLoading(false);
+          }
         }
+      }
     };
+    
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [isMenuOpen]);
 
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
+  const toggleTheme = useCallback(() => {
+    const newDarkMode = !darkMode;
+    setDarkMode(newDarkMode);
+    document.documentElement.classList.toggle("dark", newDarkMode);
+    localStorage.setItem("theme", newDarkMode ? "dark" : "light");
+  }, [darkMode]);
+
+  const refreshWebsite = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setTimeout(() => {
+      if (window.location.hash || window.scrollY > 0) {
+        window.location.href = window.location.origin + window.location.pathname;
+      }
+    }, 400);
+  };
+
+  const navLinks = [
+    { to: "home", label: "Home"},
+    { to: "about", label: "About"},
+    { to: "partners", label: "Partners"},
+    { to: "explore", label: "Explore" },
+    { to: "testimonials", label: "Testimonials" },
+    { to: "contact", label: "Contact"},
+    { to: "faqs", label: "FAQ's"},
+  ];
+
+  // Prevent hydration mismatch
+  if (!mounted) return null;
+
   return (
-    <nav className="bg-white dark:bg-gray-800 shadow-md p-4 flex justify-between items-center">
-      {/* Logo */}
-      <div className="text-xl font-bold dark:text-white">Eventify</div>
-      <ul className="hidden md:flex gap-4 text-gray-700 dark:text-gray-300">
-        <li>
-        <Link
-            to="home"
-            smooth={true}
-            duration={500}
-            activeClass="text-blue-500 font-bold"
-            className="cursor-pointer hover:text-blue-500"
+    <>
+      <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${
+        isScrolled 
+          ? "bg-white/95 dark:bg-gray-900/95 shadow-lg py-2 backdrop-blur-md border-b border-gray-200/30 dark:border-gray-700/30" 
+          : "bg-transparent py-3"
+      }`}>
+        <div className="container mx-auto px-4 flex justify-between items-center">
+          {/* Logo */}
+          <button 
+            onClick={refreshWebsite}
+            className={`text-2xl md:text-3xl font-bold transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md px-2 py-1 ${
+              isScrolled 
+                ? "bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent" 
+                : "text-white dark:text-white"
+            }`}
+            aria-label="Refresh website"
           >
-            Home
-          </Link>
-        </li>
-        <li>
-        <Link
-            to="about"
-            smooth={true}
-            duration={500}
-            className="cursor-pointer hover:text-blue-500"
-          >
-            About
-          </Link>
-        </li>
-        <li>
-        <Link
-            to="partners"
-            smooth={true}
-            duration={500}
-            className="cursor-pointer hover:text-blue-500"
-          >
-            Partners
-          </Link>
-        </li>
-        <li>
-        <Link
-            to="explore"
-            smooth={true}
-            duration={500}
-            className="cursor-pointer hover:text-blue-500"
-          >
-            Explore
-          </Link>
-        </li>
-        <li>
-        <Link
-            to="testimonials"
-            smooth={true}
-            duration={500}
-            className="cursor-pointer hover:text-blue-500"
-          >
-            Testimonials
-          </Link>
-        </li>
-        <li>
-        <Link
-            to="contact"
-            smooth={true}
-            duration={500}
-            className="cursor-pointer hover:text-blue-500"
-          >
-            Contact
-          </Link>
-        </li>
-        <li>
-        <Link
-            to="faqs"
-            smooth={true}
-            duration={500}
-            className="cursor-pointer hover:text-blue-500"
-          >
-            FAQ's
-          </Link>
-        </li>
-        
-      </ul>
-      {/* Nav Links */}
-      <div className="space-x-4">
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="px-4 py-2 bg-primary text-white rounded-md hover:bg-secondary"
-        >
-          Join Us
-        </button>
-        <button onClick={toggleTheme} className="ml-4">
-          {darkMode ? "🌙" : "☀️"}
-        </button>
-        
-          {/* Mobile Menu */}
-          <div className="-mr-2 flex md:hidden">
+            Eventify
+          </button>
+
+          {/* Desktop Navigation */}
+          <ul className="hidden md:flex gap-4 lg:gap-6 font-medium">
+            {navLinks.map((link) => (
+              <li key={link.to}>
+                <Link
+                  to={link.to}
+                  smooth={true}
+                  duration={600}
+                  spy={true}
+                  offset={-80}
+                  activeClass="text-blue-600 dark:text-blue-400 font-semibold"
+                  className={`cursor-pointer transition-all duration-300 relative py-1 px-1 text-lg ${
+                    isScrolled 
+                      ? `text-gray-800 dark:text-gray-200 hover:text-blue-500 dark:hover:text-blue-400 ${
+                          activeSection === link.to ? "text-blue-600 dark:text-blue-400 font-semibold" : ""
+                        }`
+                      : `text-white dark:text-gray-200 hover:text-blue-300 dark:hover:text-blue-400 ${
+                          activeSection === link.to ? "text-blue-300 dark:text-blue-400 font-semibold" : ""
+                        }`
+                  }`}
+                >
+                  {link.label}
+                  {activeSection === link.to && (
+                    <span className={`absolute bottom-0 left-0 w-full h-1 rounded-full ${
+                      isScrolled ? "bg-blue-600 dark:bg-blue-400" : "bg-blue-300 dark:bg-blue-400"
+                    }`}></span>
+                  )}
+                </Link>
+              </li>
+            ))}
+          </ul>
+
+          {/* Action Buttons */}
+          <div className="flex items-center gap-2 sm:gap-3">
             <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-600 hover:text-white hover:bg-gray-700"
+              onClick={() => setIsModalOpen(true)}
+              className={`px-4 py-2.5 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-300 shadow-md hover:shadow-lg text-base sm:text-lg font-medium ${
+                isScrolled 
+                  ? "bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700" 
+                  : "bg-white text-blue-600 hover:bg-blue-50 dark:bg-blue-600 dark:text-white dark:hover:bg-blue-700"
+              }`}
             >
-              <svg
-                className="h-6 w-6"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d={!isOpen ? "M4 6h16M4 12h16m-7 6h7" : "M6 18L18 6M6 6l12 12"}
-                />
-              </svg>
+              Join Us
+            </button>
+            
+            <button 
+              onClick={toggleTheme}
+              className={`p-2.5 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 flex items-center justify-center ${
+                isScrolled 
+                  ? "hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200" 
+                  : "hover:bg-white/20 dark:hover:bg-gray-700 text-white dark:text-gray-200"
+              }`}
+              aria-label="Toggle dark mode"
+            >
+              {darkMode ? <Sun size={20} /> : <Moon size={20} />}
+            </button>
+            
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className={`md:hidden p-2.5 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 ml-1 flex items-center justify-center ${
+                isScrolled 
+                  ? "text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700" 
+                  : "text-white dark:text-gray-200 hover:bg-white/20 dark:hover:bg-gray-700"
+              }`}
+              aria-label="Toggle menu"
+            >
+              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
         </div>
 
-      {/* Mobile Dropdown */}
-{isOpen && (
- <div
- className={`md:hidden bg-white shadow-lg p-4 space-y-4 fixed top-16 left-4 right-4 rounded-xl transition-transform duration-300 ${
-   isOpen ? "scale-y-100 opacity-100" : "scale-y-0 opacity-0"
- }`}
->
-
-    {/* Close Button */}
-    <button
-      onClick={() => setIsOpen(false)}
-      className="absolute top-2 right-2 text-gray-600 hover:text-gray-900"
-    >
-      ✕
-    </button>
-
-    <Link
-      to="home"
-      smooth={true}
-      duration={500}
-      className="block cursor-pointer hover:text-blue-500"
-      onClick={() => setIsOpen(false)}
-    >
-      Home
-    </Link>
-    <Link
-      to="about"
-      smooth={true}
-      duration={500}
-      className="block cursor-pointer hover:text-blue-500"
-      onClick={() => setIsOpen(false)}
-    >
-      About
-    </Link>
-    <Link
-      to="testimonials"
-      smooth={true}
-      duration={500}
-      className="block cursor-pointer hover:text-blue-500"
-      onClick={() => setIsOpen(false)}
-    >
-      Testimonials
-    </Link>
-    <Link
-      to="faqs"
-      smooth={true}
-      duration={500}
-      className="block cursor-pointer hover:text-blue-500"
-      onClick={() => setIsOpen(false)}
-    >
-      FAQs
-    </Link>
-    <Link
-      to="contact"
-      smooth={true}
-      duration={500}
-      className="block cursor-pointer hover:text-blue-500"
-      onClick={() => setIsOpen(false)}
-    >
-      Contact
-    </Link>
-  </div>
-)}
-
-      {/* Modal for Login/Signup */}
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-        <div className="bg-white dark:bg-gray-900 p-8 rounded-md relative w-80">
-          <button
-            className="absolute top-2 right-2 text-gray-700 dark:text-gray-400"
-            onClick={() => setIsModalOpen(false)}
-          >
-            ✖
-          </button>
-      
-          {/* Sign Up Form */}
-          {isLogin ? (
-            <form onSubmit={(e) => handleSubmit(e, 'login')}>
-              <input
-                type="email"
-                placeholder="Email"
-                className="w-full mb-4 p-2 rounded-md border dark:bg-gray-800 dark:text-white"
-                onChange={handleChange}
+        {/* Enhanced Mobile Navigation Menu */}
+        <AnimatePresence>
+          {isMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="fixed inset-0 z-40 md:hidden"
+            >
+              {/* Backdrop with strong blur - Prevents scrolling */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="absolute inset-0 bg-black/40 backdrop-blur-lg"
+                onClick={() => setIsMenuOpen(false)}
               />
-              <input
-                type="password"
-                placeholder="Password"
-                className="w-full mb-4 p-2 rounded-md border dark:bg-gray-800 dark:text-white"
-              />
-              <button
-                type="submit"
-                className="w-full bg-primary text-white py-2 rounded-md hover:bg-secondary"
-                // onChange={handleChange}
-              >
-                Login
-              </button>
-              <p className="text-center mt-4 text-sm dark:text-gray-400">
-                Don't have an account?{' '}
-                <span
-                  className="text-primary cursor-pointer hover:underline"
-                  onClick={() => setIsLogin(false)}
+              
+              {/* Menu Container - Perfectly centered */}
+              <div className="absolute inset-0 flex items-center justify-center p-4">
+                {/* Menu Panel - Elegant design with unique shape */}
+                <motion.div
+                  initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                  animate={{ scale: 1, opacity: 1, y: 0 }}
+                  exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                  transition={{ 
+                    type: "spring", 
+                    damping: 20, 
+                    stiffness: 300,
+                    mass: 0.5
+                  }}
+                  className="relative w-full max-w-sm bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 rounded-3xl shadow-2xl border border-white/20 dark:border-gray-700/30 overflow-hidden"
                 >
-                  Sign Up
-                </span>
-              </p>
-            </form>
-          ) : (
-            <form onSubmit={(e) => handleSubmit(e, 'signup')}>
-              <input
-                type="text"
-                placeholder="Name"
-                className="w-full mb-4 p-2 rounded-md border dark:bg-gray-800 dark:text-white"
-              />
-              <input
-                type="email"
-                placeholder="Email"
-                className="w-full mb-4 p-2 rounded-md border dark:bg-gray-800 dark:text-white"
-                onChange={handleChange}
-              />
-              <input
-                type="password"
-                placeholder="Password"
-                className="w-full mb-4 p-2 rounded-md border dark:bg-gray-800 dark:text-white"
-                onChange={handleChange}
-              />
-              <input
-                type="password"
-                placeholder="Confirm Password"
-                className="w-full mb-4 p-2 rounded-md border dark:bg-gray-800 dark:text-white"
-                onChange={handleChange}
-              />
-              <button
-                type="submit"
-                className="w-full bg-primary text-white py-2 rounded-md hover:bg-secondary"
-                onClick={(e) => handleSubmit(e, 'signup')}
-              >
-                Sign Up
-              </button>
-              <p className="text-center mt-4 text-sm dark:text-gray-400">
-                Already have an account?{' '}
-                <span
-                  className="text-primary cursor-pointer hover:underline"
-                  onClick={() => setIsLogin(true)}
-                >
-                  Login
-                </span>
-              </p>
-            </form>
+                  {/* Decorative elements */}
+                  <div className="absolute top-0 left-0 w-32 h-32 bg-blue-500/10 rounded-full -translate-x-16 -translate-y-16 blur-xl"></div>
+                  <div className="absolute bottom-0 right-0 w-40 h-40 bg-purple-500/10 rounded-full translate-x-20 translate-y-20 blur-xl"></div>
+                  
+                  {/* Header with Close Button */}
+                  <div className="flex items-center justify-between p-6 border-b border-gray-200/50 dark:border-gray-700/50">
+                    <button
+                      onClick={() => setIsMenuOpen(false)}
+                      className="p-2 rounded-full text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
+                      aria-label="Close menu"
+                    >
+                      <X size={22} />
+                    </button>
+                  </div>
+
+                  {/* Navigation Links - Compact and Elegant */}
+                  <nav className="p-6">
+                    <div className="grid gap-2">
+                      {navLinks.map((link, index) => (
+                        <motion.div
+                          key={link.to}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: index * 0.07 }}
+                        >
+                          <Link
+                            to={link.to}
+                            smooth={true}
+                            duration={600}
+                            spy={true}
+                            offset={-80}
+                            activeClass="bg-blue-100/70 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-blue-300 dark:border-blue-600 shadow-sm"
+                            className={`flex items-center w-full text-left p-3 rounded-xl text-sm font-medium transition-all duration-200 border border-transparent
+                              ${activeSection === link.to
+                                ? "bg-blue-100/70 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-blue-300 dark:border-blue-600 shadow-sm"
+                                : "text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-100/50 dark:hover:bg-gray-700/50"
+                              }`}
+                            onClick={() => setIsMenuOpen(false)}
+                          >
+                            <span className="text-lg mr-3">{link.icon}</span>
+                            <span className="flex-1">{link.label}</span>
+                            {activeSection === link.to && (
+                              <div className="w-2 h-2 bg-blue-500 dark:bg-blue-400 rounded-full ml-2" />
+                            )}
+                          </Link>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </nav>
+
+                  {/* Additional Actions */}
+                  <div className="p-6 border-t border-gray-200/50 dark:border-gray-700/50 space-y-4">
+                    
+                    <motion.button 
+                      onClick={toggleTheme}
+                      className="w-full flex items-center justify-center gap-2 py-2.5 text-xs text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors duration-200 bg-gray-100/50 dark:bg-gray-700/30 rounded-lg"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      {darkMode ? (
+                        <>
+                          <Sun size={14} />Light Theme
+                        </>
+                      ) : (
+                        <>
+                          <Moon size={14} />Dark Theme
+                        </>
+                      )}
+                    </motion.button>
+                  </div>
+                </motion.div>
+              </div>
+            </motion.div>
           )}
-            {errorMessage && (
-                <p className="text-red-500 mt-2">{errorMessage}</p>
-            )}
-        </div>
-      </div>
-      )}
-    </nav>
+        </AnimatePresence>
+      </nav>
+
+      {/* Auth Modal */}
+      <AuthModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+      />
+    </>
   );
 };
 

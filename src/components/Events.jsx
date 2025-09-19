@@ -38,7 +38,7 @@ const EventsDashboard = () => {
 
   const handleBookingSuccess = () => {
     setSuccessMessage(true);
-    setTimeout(() => setSuccessMessage(false), 3000); // Automatically hide success message after 3 seconds
+    setTimeout(() => setSuccessMessage(false), 3000);
   };
 
   const filteredEvents = events.filter((event) =>
@@ -57,9 +57,7 @@ const EventsDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-purple-500 to-blue-500 text-gray-900">
-      {/* Top Bar */}
       <header className="flex flex-wrap justify-between items-center p-6">
-        {/* Search Bar */}
         <div className="w-full md:w-2/3 flex items-center justify-center mb-4 md:mb-0">
           <input
             type="text"
@@ -72,8 +70,6 @@ const EventsDashboard = () => {
             Search
           </button>
         </div>
-
-        {/* Create Event Button */}
         <button
           onClick={() => setShowCreateEventModal(true)}
           className="px-4 py-2 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-600"
@@ -81,8 +77,6 @@ const EventsDashboard = () => {
           Create Event
         </button>
       </header>
-
-      {/* Event Categories */}
       <section>
         <h2 className="text-2xl font-semibold text-white mt-4 mb-4">
           Popular Events
@@ -114,13 +108,9 @@ const EventsDashboard = () => {
             ))}
         </div>
       </section>
-
-      {/* Footer */}
       <footer className="mt-12 bg-gray-900 text-white py-6">
         <div className="text-center text-sm">© 2025 A Nextspace Company</div>
       </footer>
-
-      {/* Success Message */}
       {successMessage && (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
           <div className="bg-white p-6 rounded-lg shadow-lg text-center">
@@ -136,8 +126,6 @@ const EventsDashboard = () => {
           </div>
         </div>
       )}
-
-      {/* Modals */}
       {showCreateEventModal && (
         <CreateEventModal onClose={() => setShowCreateEventModal(false)} />
       )}
@@ -179,7 +167,7 @@ const EventCard = ({ event, onBookNow }) => {
 const CreateEventModal = ({ onClose }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
-    onClose(); // Close the modal
+    onClose();
   };
 
   return (
@@ -244,8 +232,8 @@ const CreateEventModal = ({ onClose }) => {
 const BookingModal = ({ onClose, onSuccess }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSuccess(); // Show success message
-    onClose(); // Close the modal
+    onSuccess(); 
+    onClose(); 
   };
 
   return (
